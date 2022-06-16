@@ -1,0 +1,82 @@
+适用于最新3.8.0版，使用方式如下：
+	Book* book = xlCreateXMLBook();
+	const wchar_t * x = L"Halil Kural";
+	const wchar_t * y = L"windows-2723210a07c4e90162b26966a8jcdboe";
+	book->setKey(x, y);
+
+
+
+编程注册方法：
+
+#include <stdio.h>
+#include <conio.h>
+#include "libxl.h"
+ 
+int main()
+{
+    BookHandle book = xlCreateBook();
+    if(book) 
+    {   
+        xlBookSetKey(book,L"GCCG",L"windows-282123090cc0e6036db16b60a1o3p0h9");   //注册
+        if(xlBookLoad(book, L"example.xls")) 
+        {
+            SheetHandle sheet = xlBookGetSheet(book, 0);
+            if(sheet)
+            {                
+                double d = xlSheetReadNum(sheet, 3, 1, 0);
+                xlSheetWriteNum(sheet, 3, 1, d * 2, 0);
+                xlSheetWriteStr(sheet, 4, 1, L"new string", 0);     
+            }
+ 
+            if(xlBookSave(book, L"example.xls")) printf("\nFile example.xls has been modified.\n");
+        } 
+ 
+        xlBookRelease(book);
+    }
+ 
+    printf("\nPress any key to exit...");
+    _getch();
+ 
+    return 0;
+}
+
+
+
+破解算法：
+算法总结：
+1. 注册码格式：windows-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx(windows- 后面 32 位) 
+
+2. 32位注册码的第1，3，5，7，9，11，13，15，17，19，21，23，25位是固定值， 分别是  22200ce06b66a
+
+3. 32位注册码的第2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24, 26, 28,30, 32位是：用户名字符串，经过翻转， 求出 MD5 值， 然后 取 前 16 位
+
+4. 32位注册码的第27, 29, 31 位满足以下关系：
+
+    (1)   ASC(29位)+ASC(31位)-0x69 = ASC(27位字母)
+
+    (2)  ASC(29位) >= 0x63  并且  ASC(29位) 不能等于 0x65，  而且 当 ASC(29位) = 0x66 时，ASC(31位) >=0x6C
+
+
+
+
+
+
+
+
+
+=======================================================================================
+
+#if !defined(WIN32) && !defined(WIN64)
+    book->setKey("mylibxl", "linux-2f2129060dcce70c67ba606aa8idk3g8");
+#endif
+
+
+
+std::map<std::string, std::string> g_libxl_linux = {
+        {"mylibxl", "linux-2f2129060dcce70c67ba606aa8idk3g8"},
+        {"Halil Kural", "windows-2723210a07c4e90162b26966a8jcdboe"},
+};
+
+
+
+
